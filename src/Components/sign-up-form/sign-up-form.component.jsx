@@ -1,9 +1,10 @@
-import { useState,useContext } from "react";
+import { useState } from "react";
 import {createAuthUserWithEmailAndPassword,createUserDocumentFromAuth} from'../../utils/firebase.utils';
 import FormInput from "../form-input/form-input.component";
-import { UserContext } from "../../contexts/userContext";
 import './sign-up-form.styles.scss';
-import Button from "../button/button.component";
+import Button,{BUTTON_TYPE_CLASSES} from "../button/button.component";
+import { useDispatch } from "react-redux";
+import { signUpStart } from "../../store/user/user.action";
 
 const SignUpForm=()=>{ 
     const defaultFormFields={
@@ -15,7 +16,7 @@ const SignUpForm=()=>{
     
     const[formFields,setFromFields]=useState(defaultFormFields);
     const{displayName,email,password,confirmPassword}=formFields;
-    const{setCurrentUser}=useContext(UserContext);
+    const dispatch=useDispatch();
     const handleChange=(event)=>{
         const {name,value}=event.target;
         setFromFields({
@@ -27,6 +28,7 @@ const SignUpForm=()=>{
         setFromFields(defaultFormFields)
     }
     const handleSubmit= async(event)=>{
+  
        event.preventDefault();
        if(password!==confirmPassword){
            alert('Password do not match')
@@ -34,12 +36,11 @@ const SignUpForm=()=>{
        }
 
        try{
-         const {user}= await createAuthUserWithEmailAndPassword(email,password)
-         setCurrentUser(user) 
-         await createUserDocumentFromAuth(user,{displayName})
-         
-          resetFields()
-         
+        //  const {user}= await createAuthUserWithEmailAndPassword(email,password)
+        //  await createUserDocumentFromAuth(user,{displayName}
+        // )
+        dispatch(signUpStart(email,password,displayName))        
+          resetFields()        
        }
        catch(error){
            if(error.code==='auth/email-already-in-use'){
@@ -56,7 +57,7 @@ console.log(formFields)
          <span>Sign up with your email and password</span>
            <form onSubmit={handleSubmit}>
              <FormInput
-                label="displayName"
+                label="Display Name"
                 type="text" 
                 required 
                 onChange={handleChange} 
@@ -83,18 +84,23 @@ console.log(formFields)
               />
 
              <FormInput
-                label="Confirm Passwordassword"
+                label="Confirm Password"
                 type="password" 
                 required 
                 onChange={handleChange} 
                 name="confirmPassword"
                 value={confirmPassword}
               />
-           
-             <Button buttonType='default' type="submit">Sign Up</Button>
+              <Button 
+              buttonType={BUTTON_TYPE_CLASSES.InvertedButton}
+              type='submit'>
+              sign up
+              </Button>
+             
            </form>
         </div>
     )
+    // <Button buttonType='default' type="submit">Sign Up</Button>
 }
 
 export default SignUpForm
