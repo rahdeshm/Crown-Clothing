@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const BaseButton = styled.button`
   min-width: 165px;
-  width: auto;
+  width: 100px;
   height: 50px;
   letter-spacing: 0.5px;
   line-height: 50px;
